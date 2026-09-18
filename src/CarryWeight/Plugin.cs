@@ -1,32 +1,33 @@
+using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
 
 namespace CarryWeight;
 
-[BepInPlugin(Guid, Name, Version)]
+[BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 public class CarryWeightPlugin : BaseUnityPlugin
 {
-    public const string Guid = "needlemods.valheim.carryweight";
-    public const string Name = "CarryWeight";
-    public const string Version = "1.0.0";
-
-    internal const float VanillaBase = 300f;
-
-    internal static ConfigEntry<float> BaseCarryWeight;
+    internal static ConfigEntry<float> BaseCarryWeight = null!;
 
     private void Awake()
     {
         BaseCarryWeight = Config.Bind("General", "BaseCarryWeight", 1000f,
-            "Base max carry weight, replacing the game's default of 300. Bonuses like Megingjord still add on top.");
-        new Harmony(Guid).PatchAll();
-        Logger.LogInfo($"{Name} {Version} loaded, base carry weight {BaseCarryWeight.Value}");
+            new ConfigDescription(
+                "Base max carry weight, replacing the game's default. Bonuses like Megingjord still add on top.",
+                new AcceptableValueRange<float>(300f, 10000f)));
+        var harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
+        harmony.PatchAll();
+        var patched = harmony.GetPatchedMethods().Count();
+        if (patched == 0)
+            Logger.LogError("No methods patched — a game update likely changed Player.GetMaxCarryWeight");
+        Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION} loaded, {patched} patch(es), base carry weight {BaseCarryWeight.Value}");
     }
 }
 
 [HarmonyPatch(typeof(Player), nameof(Player.GetMaxCarryWeight))]
 internal static class GetMaxCarryWeightPatch
 {
-    private static void Postfix(ref float __result) =>
-        __result += CarryWeightPlugin.BaseCarryWeight.Value - CarryWeightPlugin.VanillaBase;
+    private static void Postfix(Player __instance, ref float __result) =>
+        __result += CarryWeightPlugin.BaseCarryWeight.Value - __instance.m_maxCarryWeight;
 }

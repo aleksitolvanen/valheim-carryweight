@@ -3,16 +3,19 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
     <AssemblyName>CarryWeight</AssemblyName>
     <RootNamespace>CarryWeight</RootNamespace>
+    <Product>CarryWeight</Product>
     <Version>1.0.0</Version>
-    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+    <BepInExPluginGuid>needlemods.valheim.carryweight</BepInExPluginGuid>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="BepInEx.Core" Version="5.4.21" />
-    <PackageReference Include="UnityEngine.Modules" Version="6000.0.47" IncludeAssets="compile" />
-    <PackageReference Include="ValheimGameLibs" Version="0.221.4" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" PrivateAssets="all" />
+    <PackageReference Include="UnityEngine.Modules" Version="6000.0.75" IncludeAssets="compile" />
+    <PackageReference Include="Digitalroot.Valheim.Common.References" Version="1.0.12" />
   </ItemGroup>
 
 </Project>
